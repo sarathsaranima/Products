@@ -51,7 +51,7 @@ def read_items(args):
         if not product:
             return generate_failure_response(BAD_REQUEST, 'Product does not exist')
         else:
-            result = product_schema.dump(product).data
+            result = product_schema.dump(product)
             return generate_success_response(OK, result)
     try:
         logging.info("get request received with arguments : {}".format(args))
@@ -62,7 +62,7 @@ def read_items(args):
                 return generate_failure_response(BAD_REQUEST, 'Invalid data provided')
         else:
             products = Product.query.all()
-            products = products_schema.dump(products).data
+            products = products_schema.dump(products)
             return generate_success_response(OK, products)
     except Exception as e:
         return generate_failure_response(INTERNAL_SERVER_ERROR, str(e))
@@ -78,9 +78,7 @@ def update_item(json_data):
         if not json_data:
             generate_failure_response(BAD_REQUEST, 'No input data provided')
         # Validate and deserialize input
-        data, errors = product_schema.load(json_data)
-        if errors:
-            return errors, UNPROCESSABLE_ENTITY.value
+        data = product_schema.load(json_data)
         if 'id' not in data or data['id'] is None:
             return generate_failure_response(BAD_REQUEST, 'Invalid data provided')
         product = Product.query.filter_by(id=data['id']).first()
@@ -98,7 +96,7 @@ def update_item(json_data):
                 setattr(product, attr, val)
         db.session.commit()
         product = Product.query.filter_by(id=data['id']).first()
-        result = product_schema.dump(product).data
+        result = product_schema.dump(product)
         return generate_success_response(OK, result)
     except Exception as e:
         return generate_failure_response(INTERNAL_SERVER_ERROR, str(e))
@@ -114,9 +112,7 @@ def create_item(json_data):
         if not json_data:
             return generate_failure_response(BAD_REQUEST, 'No input data provided')
         # Validate and deserialize input
-        data, errors = product_schema.load(json_data)
-        if errors:
-            return errors, UNPROCESSABLE_ENTITY
+        data = product_schema.load(json_data)
         # Check if the item already exists.
         product = Product.query.filter_by(name=data['name']).first()
         if product:
@@ -128,7 +124,7 @@ def create_item(json_data):
                           price=data['price'])
         db.session.add(product)
         db.session.commit()
-        result = product_schema.dump(product).data
+        result = product_schema.dump(product)
         return generate_success_response(CREATED, result)
     except Exception as e:
         return generate_failure_response(INTERNAL_SERVER_ERROR, str(e))
@@ -149,7 +145,7 @@ def delete_item(args):
             product = Product.query.filter_by(id=arg_id).delete()
             if not product:
                 return generate_failure_response(BAD_REQUEST, 'Product does not exist')
-            result = product_schema.dump(product).data
+            result = product_schema.dump(product)
             db.session.commit()
             return generate_success_response(OK, result)
         else:

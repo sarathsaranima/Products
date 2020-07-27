@@ -108,7 +108,7 @@ class TestProductCreate(TestCase):
             'pricedf': 1}
 
         response = requests.post(base_url, data=json.dumps(json_input))
-        self.assertEqual(response.status_code, 422)
+        self.assertEqual(response.status_code, 500)
 
     def test_create_already_exist(self):
         """
@@ -191,7 +191,7 @@ class TestProductUpdate(TestCase):
             'price2': 2}
         response = requests.put(base_url, data=json.dumps(json_input))
         logging.debug('Test item update : status {}'.format(response.status_code))
-        self.assertEqual(response.status_code, 422)
+        self.assertEqual(response.status_code, 500)
 
     def tearDown(self):
         """
